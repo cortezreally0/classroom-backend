@@ -1,11 +1,15 @@
 import express from "express";
 import cors from "cors";
+import 'dotenv/config';
 
 import subjectsRouter from "./routes/subjects";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+if (!process.env.FRONTEND_URL) {
+    throw new Error('FRONTEND_URL is required for CORS configuration');
+}
 app.use(cors({
     origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST", "PUT", "DELETE"],

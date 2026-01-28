@@ -7,10 +7,12 @@ const router = express.Router();
 
 router.get('/', async (req , res) => {
     try {
-        const { search, department, page = 1, limit = 10 } = req.query;
+        const { search, department, page, limit } = req.query;
 
-        const currentPage = Math.max(1, +page);
-        const limitPerPage = Math.max(1, +limit);
+        const pageNum = typeof page === 'string' ? parseInt(page, 10) : NaN;
+        const limitNum = typeof limit === 'string' ? parseInt(limit, 10) : NaN;
+        const currentPage = Number.isFinite(pageNum) && pageNum > 0 ? pageNum : 1;
+        const limitPerPage = Number.isFinite(limitNum) && limitNum > 0 ? Math.min(limitNum, 100) : 10;
 
         const offset = (currentPage - 1) * limitPerPage;
 
@@ -25,8 +27,10 @@ router.get('/', async (req , res) => {
                 );
         }
 
+        //search query with SQL protection
         if(department) {
-            filterConditions.push(ilike(departments.name, `%${department}%`));
+            const depPattern = `%${String(department).replace(/[%_]/g, '\\$&')}%`;
+            filterConditions.push(ilike(departments.name, depPattern));
         }
 
         const whereClause = filterConditions.length > 0 ? and(...filterConditions) : undefined;
@@ -58,7 +62,7 @@ router.get('/', async (req , res) => {
             }
         });
     } catch (e) {
-        console.error(`Error while getting new departments from server: ${e}`);
+        console.error(`Error while getting subjects from server: ${e}`);
         res.status(500).json({error: 'Something went wrong'});
     }
 })
