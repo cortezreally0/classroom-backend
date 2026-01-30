@@ -8,6 +8,13 @@
       "when": 1769514257002,
       "tag": "0000_rich_shriek",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769789430048,
+      "tag": "0001_condemned_vector",
+      "breakpoints": true
     }
   ]
 }
