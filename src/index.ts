@@ -21,7 +21,7 @@ app.use(express.json());
 app.use('/api/subjects', subjectsRouter)
 
 app.get("/", (req, res) => {
-    res.send("Hello World! Welcome to the backend!");
+    res.send("Hello World! Welcome to the API!");
 });
 
 app.listen(PORT, () => {
