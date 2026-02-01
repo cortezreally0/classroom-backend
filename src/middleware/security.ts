@@ -14,16 +14,16 @@ const securityMiddleware = async (req: Request, res: Response, next: NextFunctio
         switch (role) {
             case 'admin':
                 limit=20;
-                message = 'Admin request limit exceeded (20 per minutes). Slow down.';
+                message = 'Admin request limit exceeded (20 per minute). Slow down.';
                 break;
             case 'teacher':
             case 'student':
                 limit=10;
-                message = 'User request limit exceeded (10 per minutes). Please wait.';
+                message = 'User request limit exceeded (10 per minute). Please wait.';
                 break;
                 default:
                     limit=5;
-                    message = 'Guest request limit exceeded (5 per minutes). Please sign up for higher limits.';
+                    message = 'Guest request limit exceeded (5 per minute). Please sign up for higher limits.';
         }
 
         const client = aj.withRule(
@@ -38,19 +38,26 @@ const securityMiddleware = async (req: Request, res: Response, next: NextFunctio
             headers: req.headers,
             method: req.method,
             url: req.originalUrl ?? req.url,
-            socket: {remoteAddress: req.socket.remoteAddress ?? req.ip ?? '0.0.0.0'},
+            // socket: {remoteAddress: req.socket.remoteAddress ?? req.ip ?? '0.0.0.0'},
+            socket: {remoteAddress: (() => {
+                const ip = req.socket.remoteAddress ?? req.ip;
+                if (!ip) {
+                    console.warn('Unable to determine client IP, using fallback');
+                }
+                return ip ?? '0.0.0.0';
+            })()},
         }
 
         const decision = await client.protect(arcjetRequest);
 
         if (decision.isDenied() && decision.reason.isBot()) {
-            return res.status(403).json({error: 'Forbidden', message: 'Automated request are not allowed'});
+            return res.status(403).json({error: 'Forbidden', message: 'Automated requests are not allowed'});
         }
         if (decision.isDenied() && decision.reason.isShield()) {
             return res.status(403).json({error: 'Forbidden', message: 'Request Blocked by security policy'});
         }
         if (decision.isDenied() && decision.reason.isRateLimit()) {
-            return res.status(403).json({error: 'Too many request', message });
+            return res.status(429).json({error: 'Too many Requests', message });
         }
 
         next();
