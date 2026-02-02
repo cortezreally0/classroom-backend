@@ -10,9 +10,9 @@ if (!FRONTEND_URL) throw new Error("FRONTEND_URL is required");
 
 export const auth = betterAuth({
     // Secret key of better auth
-    secret: BETTER_AUTH_SECRET,
+    secret: process.env.BETTER_AUTH_SECRET!,
     // Trusted Origin frontend API
-    trustedOrigins: [FRONTEND_URL],
+    trustedOrigins: [process.env.FRONTEND_URL!],
     database: drizzleAdapter(db, {
         provider: "pg",
         // add schema API for db find
@@ -25,9 +25,9 @@ export const auth = betterAuth({
         additionalFields: {
             // Role
             role: {
-                type: 'string', required: true, default: "student", input: true,
+                type: 'string', required: true, defaultValue: "student", input: true,
                 // For Client side not input what role can be use
-                // type: "string", required: true, default: "student", input: false,
+                // type: "string", required: true, defaultValue: "student", input: false,
             },
             // Profile Pic
             imageCldPubId: {
