@@ -15,6 +15,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@apminsight/native-stats": "^2.0.0",
     "@arcjet/inspect": "^1.0.0-beta.10",
     "@arcjet/node": "^1.0.0-beta.18",
     "@neondatabase/serverless": "^1.0.2",
