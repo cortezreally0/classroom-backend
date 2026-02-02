@@ -18,8 +18,8 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }))
-// Better-auth path
-app.all('/api/auth/*splat', toNodeHandler(auth));
+// Better-auth path with middleware
+app.all('/api/auth/*splat', securityMiddleware, toNodeHandler(auth));
 
 app.use(express.json());
 
