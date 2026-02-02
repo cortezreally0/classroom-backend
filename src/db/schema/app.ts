@@ -11,7 +11,7 @@ import {
     primaryKey
 } from "drizzle-orm/pg-core";
 import {relations} from "drizzle-orm";
-import {user} from "./auth"; // from auth.js to auth
+import {user} from "./auth.js"; // from auth.js to auth
 
 export const classStatusEnum = pgEnum('class_status', ['active', 'inactive', 'archived']);
 
