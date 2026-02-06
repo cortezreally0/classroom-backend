@@ -1,13 +1,13 @@
 import express from 'express';
 import {and, desc, eq, getTableColumns, ilike, or, sql} from "drizzle-orm";
-import {departments, subjects} from "../db/schema/index.js";
+import { user } from "../db/schema/index.js";
 import { db } from "../db/index.js";
 
 const router = express.Router();
 
 router.get('/', async (req , res) => {
     try {
-        const { search, department, page, limit } = req.query;
+        const { search, role, page, limit } = req.query;
 
         const pageNum = typeof page === 'string' ? parseInt(page, 10) : NaN;
         const limitNum = typeof limit === 'string' ? parseInt(limit, 10) : NaN;
@@ -21,40 +21,44 @@ router.get('/', async (req , res) => {
         if(search) {
             filterConditions.push(
                 or(
-                        ilike(subjects.name, `%${search}%`),
-                        ilike(subjects.code, `%${search}%`),
-                    )
-                );
+                    ilike(user.name, `%${search}%`),
+                    sql`${user.role}::text ilike ${`%${search}%`}`
+                )
+            );
         }
 
         //search query with SQL protection
-        if(department) {
-            const depPattern = `%${String(department).replace(/[%_]/g, '\\$&')}%`;
-            filterConditions.push(ilike(departments.name, depPattern));
+        // if(role) {
+        //     const rolePattern = `%${String(role).replace(/[%_]/g, '\\$&')}%`;
+        //     filterConditions.push(ilike(user.role, rolePattern));
+        // }
+
+        if (role) {
+            // Cast the enum to text here as well
+            filterConditions.push(
+                sql`${user.role}::text ilike ${`%${role}%`}`
+            );
         }
 
         const whereClause = filterConditions.length > 0 ? and(...filterConditions) : undefined;
 
         const countResult = await db
             .select({count: sql<number>`count(*)`})
-            .from(subjects)
-            .leftJoin(departments, eq(subjects.departmentId, departments.id))
+            .from(user)
             .where(whereClause);
 
         const totalCount = countResult[0]?.count ?? 0;
 
-        const subjectsList = await db
-            .select({
-            ...getTableColumns(subjects),
-            departments:  {...getTableColumns(departments)}
-        }).from(subjects).leftJoin(departments, eq(subjects.departmentId, departments.id))
+        const usersList = await db
+            .select({...getTableColumns(user) })
+            .from(user)
             .where(whereClause)
-            .orderBy(desc(subjects.createdAt))
+            .orderBy(desc(user.createdAt))
             .limit(limitPerPage)
             .offset(offset);
 
         res.status(200).json({
-            data: subjectsList,
+            data: usersList,
             pagination: {
                 page: currentPage,
                 limit: limitPerPage,
@@ -63,7 +67,7 @@ router.get('/', async (req , res) => {
             }
         });
     } catch (e) {
-        console.error(`Error while getting subjects from server: ${e}`);
+        console.error(`Error while getting user from server: ${e}`);
         res.status(500).json({error: 'Something went wrong'});
     }
 })
