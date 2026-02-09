@@ -6,8 +6,7 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
     try {
-        const {name, teacherId, subjectId, capacity, description,
-            status, bannerUrl, bannerCldPubId} = req.body;
+        const {name, teacherId, subjectId, capacity, description, status, bannerUrl, bannerCldPubId} = req.body;
 
         const [createdClass] = await db
             .insert(classes)
