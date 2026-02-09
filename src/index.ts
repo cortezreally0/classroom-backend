@@ -10,7 +10,7 @@ import usersRouter from "./routes/users.js";
 import classesRouter from "./routes/classes.js";
 import securityMiddleware from "./middleware/security.js";
 import {toNodeHandler} from "better-auth/node";
-// import {auth} from "./lib/auth.js";
+import {auth} from "./lib/auth.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -24,7 +24,7 @@ app.use(cors({
     credentials: true
 }))
 // Better-auth path with middleware
-// app.all('/api/auth/*splat',toNodeHandler(auth));
+app.all('/api/auth/*splat',toNodeHandler(auth));
 
 app.use(express.json());
 
