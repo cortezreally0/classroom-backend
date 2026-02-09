@@ -10,7 +10,7 @@ import usersRouter from "./routes/users.js";
 import classesRouter from "./routes/classes.js";
 import securityMiddleware from "./middleware/security.js";
 import {toNodeHandler} from "better-auth/node";
-// import {auth} from "./lib/auth";
+// import {auth} from "./lib/auth.js";
 
 const app = express();
 const PORT = process.env.PORT || 8000;
